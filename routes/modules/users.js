@@ -18,27 +18,53 @@ router.get('/register', (req, res) => {
 // 登出
 router.get('/logout', (req, res) => {
   req.logout()
+  req.flash('success', '成功登出！')
   res.redirect('/users/login')
 })
 
 // 接收登入表單
 router.post(
   '/login',
+  (req, res, next) => {
+    const { email, password } = req.body
+    if (email === '' || password === '') {
+      req.flash('alert', '請輸入帳號密碼！')
+      return res.redirect('/users/login')
+    }
+    return next()
+  },
   passport.authenticate('local', {
     successRedirect: '/',
-    failureRedirect: '/users/login'
+    failureRedirect: '/users/login',
+    failureFlash: true
   })
 )
 
 // 接收註冊表單
 router.post('/register', (req, res) => {
-  const { name, email, password } = req.body
+  const { name, email, password, confirmPassword } = req.body
+  const errors = []
+
+  if (
+    name === '' ||
+    email === '' ||
+    password === '' ||
+    confirmPassword === ''
+  ) {
+    errors.push({ message: '所有欄位均為必填！' })
+  }
+  if (password !== confirmPassword) {
+    errors.push({ message: '密碼與確認密碼不相符！' })
+  }
   User.findOne({ where: { email } }).then((user) => {
     if (user) {
-      console.log('User already exists')
+      errors.push({ message: '此帳號已被註冊！' })
+    }
+    if (errors.length) {
       return res.render('register', {
         name,
-        email
+        email,
+        errors
       })
     }
     return bcrypt
