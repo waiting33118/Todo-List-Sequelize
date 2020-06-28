@@ -1,7 +1,7 @@
 module.exports = {
   authenticator: (req, res, next) => {
     if (req.isAuthenticated()) return next()
-    console.log('You are not login yet!')
+    req.flash('alert', '請先登入帳號！')
     return res.redirect('/users/login')
   }
 }
