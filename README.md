@@ -32,7 +32,7 @@ npm install
 
 #### 建立 MySQL Connection(請在 WorkBench 裡操作 SQL 指令)
 
-#####預設密碼為 password
+**預設密碼為 password**
 
 ```
 drop database if exists todo_sequelize;
