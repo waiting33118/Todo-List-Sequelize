@@ -3,6 +3,7 @@ const exphbs = require('express-handlebars')
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
 const session = require('express-session')
+const flash = require('connect-flash')
 
 const routes = require('./routes')
 const usePassport = require('./config/passport')
@@ -21,11 +22,15 @@ app.use(
 )
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
+app.use(flash())
 usePassport(app)
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.isAuthenticated()
   res.locals.user = req.user
-  next()
+  res.locals.alert = req.flash('alert')
+  res.locals.error = req.flash('error')
+  res.locals.success = req.flash('success')
+  return next()
 })
 app.use(routes)
 
